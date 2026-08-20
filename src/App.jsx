@@ -49,6 +49,46 @@ const FLOWERS = [
   { id: "pixel-bouquet", label: "pixel bouquet", kind: "pixel", color: "#E9A9BD", accent: "#8B6C7C" },
 ];
 
+
+const FLOWER_PALETTES = {
+  garden: {
+    label: "garden pastel",
+    description: "soft botanical colours",
+    colors: {
+      daisy: ["#FFFDF2", "#F4C95D"], lavender: ["#B99AD9", "#77539B"], forget: ["#9FC9EE", "#4D79B7"],
+      tulip: ["#F08FA3", "#B94765"], rose: ["#D95F72", "#8F3046"], peony: ["#F2A5BE", "#B95678"],
+      sunflower: ["#F4C94F", "#9B6328"], baby: ["#FFFDF7", "#D8CFC1"], hydrangea: ["#9BAFE0", "#6573A5"],
+      lily: ["#FFF8E7", "#C79E75"], gerbera: ["#EF8FAE", "#A93F69"], calla: ["#FFF7E3", "#B39A62"],
+      "pixel-daisy": ["#FFF3C9", "#D5A83B"], "pixel-tulip": ["#F08FA3", "#B94765"], "pixel-lavender": ["#B99AD9", "#77539B"],
+      "pixel-rose": ["#D95F72", "#8F3046"], "pixel-sunflower": ["#F4C94F", "#9B6328"], "pixel-bouquet": ["#E8A8BA", "#765B8E"]
+    }
+  },
+  sunset: {
+    label: "sunset garden",
+    description: "peach, coral & plum",
+    colors: {
+      daisy: ["#FFF0C7", "#E7A63E"], lavender: ["#C7A0D9", "#754B87"], forget: ["#8FB6D8", "#456E9C"],
+      tulip: ["#F28A79", "#B8444E"], rose: ["#D96A69", "#8E3341"], peony: ["#F2A0A1", "#B95662"],
+      sunflower: ["#F4B83F", "#8D5422"], baby: ["#FFF2DF", "#D3B59D"], hydrangea: ["#A6A4D3", "#66598E"],
+      lily: ["#FFE8C8", "#B97C62"], gerbera: ["#F18B82", "#A74358"], calla: ["#FFEBD0", "#A9785A"],
+      "pixel-daisy": ["#FFE8B7", "#D69432"], "pixel-tulip": ["#F18A79", "#A83F4A"], "pixel-lavender": ["#C7A0D9", "#754B87"],
+      "pixel-rose": ["#D96A69", "#8E3341"], "pixel-sunflower": ["#F4B83F", "#8D5422"], "pixel-bouquet": ["#E7A2A7", "#765274"]
+    }
+  },
+  vintage: {
+    label: "vintage botanical",
+    description: "dusty rose, cream & sage",
+    colors: {
+      daisy: ["#F5EED8", "#C79D55"], lavender: ["#B7A4C3", "#6F607D"], forget: ["#9AAFC1", "#5C7180"],
+      tulip: ["#D79A9A", "#8D555A"], rose: ["#C98184", "#7E474E"], peony: ["#D7A0A7", "#98616B"],
+      sunflower: ["#D8B45B", "#7C6030"], baby: ["#F3EBDD", "#BFB5A2"], hydrangea: ["#9EA8B7", "#66717D"],
+      lily: ["#EEE5D0", "#9E816B"], gerbera: ["#D79A9A", "#8A5960"], calla: ["#EEE4C9", "#8F8062"],
+      "pixel-daisy": ["#EDE3C7", "#B48B4B"], "pixel-tulip": ["#D39A9B", "#88535A"], "pixel-lavender": ["#B7A4C3", "#6F607D"],
+      "pixel-rose": ["#C98184", "#7E474E"], "pixel-sunflower": ["#D8B45B", "#7C6030"], "pixel-bouquet": ["#C9A0A5", "#746479"]
+    }
+  }
+};
+
 const ARRANGEMENTS = [
   { id: "round", label: "hand-tied", emoji: "✿" },
   { id: "wild", label: "wild gather", emoji: "❀" },
@@ -129,152 +169,59 @@ function HeartDoodle({ style = "classic", size = 18, color = "#C9798D" }) {
   return <Heart size={size} fill={color} strokeWidth={1.4} color={color} />;
 }
 
-function FlowerIllustration({ flower, scale = 1, className = "" }) {
+function FlowerIllustration({ flower, scale = 1, className = "", palette = "garden" }) {
   const f = FLOWERS.find((x) => x.id === flower) || FLOWERS[0];
+  const paletteData = FLOWER_PALETTES[palette]?.colors?.[f.id] || [f.color, f.accent];
+  if (f.kind === "pixel") return <PixelFlower type={f.id} scale={scale} palette={palette} />;
 
-  if (f.kind === "pixel") {
-    return <PixelFlower type={f.id} scale={scale} />;
-  }
-
-  const petalCount =
-    f.id === "rose" ? 11 :
-    f.id === "peony" ? 16 :
-    f.id === "hydrangea" ? 10 :
-    f.id === "lavender" ? 8 :
-    f.id === "forget" ? 8 :
-    f.id === "baby" ? 12 :
-    f.id === "sunflower" ? 16 :
-    f.id === "calla" ? 1 : 8;
-
-  if (f.id === "lavender") {
-    return (
-      <div className={`flower-art lavender-art ${className}`} style={{ transform: `scale(${scale})` }}>
-        <div className="lavender-stem" />
-        {Array.from({ length: 8 }).map((_, i) => (
-          <span
-            key={i}
-            className="lavender-bud"
-            style={{
-              left: `${25 + pseudoRandom(i + 5) * 45}%`,
-              top: `${8 + i * 9}%`,
-              transform: `rotate(${(pseudoRandom(i + 10) - 0.5) * 45}deg)`,
-            }}
-          />
-        ))}
-        <span className="leaf leaf-a" />
-        <span className="leaf leaf-b" />
-      </div>
-    );
-  }
-
-  if (f.id === "baby") {
-    return (
-      <div className={`flower-art baby-art ${className}`} style={{ transform: `scale(${scale})` }}>
-        <div className="baby-stem" />
-        {Array.from({ length: 12 }).map((_, i) => (
-          <span
-            key={i}
-            className="baby-flower"
-            style={{
-              left: `${18 + pseudoRandom(i * 2) * 64}%`,
-              top: `${8 + pseudoRandom(i * 4) * 62}%`,
-            }}
-          >
-            ✿
-          </span>
-        ))}
-      </div>
-    );
-  }
-
-  if (f.id === "calla") {
-    return (
-      <div className={`flower-art calla-art ${className}`} style={{ transform: `scale(${scale})` }}>
-        <div className="calla-leaf leaf-a" />
-        <div className="calla-leaf leaf-b" />
-        <div className="calla-bloom">
-          <span />
-        </div>
-      </div>
-    );
-  }
-
+  const petalCount = f.id === "rose" ? 11 : f.id === "peony" ? 16 : f.id === "hydrangea" ? 10 : f.id === "lavender" ? 8 : f.id === "forget" ? 8 : f.id === "baby" ? 12 : f.id === "sunflower" ? 16 : f.id === "calla" ? 1 : 8;
+  if (f.id === "lavender") return (
+    <div className={`flower-art lavender-art ${className}`} style={{ "--flower": paletteData[0], "--accent": paletteData[1], transform: `scale(${scale})` }}>
+      <div className="lavender-stem" />
+      {Array.from({ length: 10 }).map((_, i) => <span key={i} className="lavender-bud" style={{ left: `${22 + pseudoRandom(i + 5) * 48}%`, top: `${6 + i * 8}%`, transform: `rotate(${(pseudoRandom(i + 10) - 0.5) * 45}deg)` }} />)}
+      <span className="leaf leaf-a" /><span className="leaf leaf-b" />
+    </div>
+  );
+  if (f.id === "baby") return (
+    <div className={`flower-art baby-art ${className}`} style={{ "--flower": paletteData[0], "--accent": paletteData[1], transform: `scale(${scale})` }}>
+      <div className="baby-stem" />
+      {Array.from({ length: 14 }).map((_, i) => <span key={i} className="baby-flower" style={{ left: `${14 + pseudoRandom(i * 2) * 70}%`, top: `${6 + pseudoRandom(i * 4) * 66}%` }}>✿</span>)}
+    </div>
+  );
+  if (f.id === "calla") return (
+    <div className={`flower-art calla-art ${className}`} style={{ "--flower": paletteData[0], "--accent": paletteData[1], transform: `scale(${scale})` }}>
+      <div className="calla-leaf leaf-a" /><div className="calla-leaf leaf-b" /><div className="calla-bloom"><span /></div>
+    </div>
+  );
   return (
-    <div
-      className={`flower-art ${f.id}-art ${className}`}
-      style={{
-        "--flower": f.color,
-        "--accent": f.accent,
-        transform: `scale(${scale})`,
-      }}
-    >
+    <div className={`flower-art ${f.id}-art ${className}`} style={{ "--flower": paletteData[0], "--accent": paletteData[1], transform: `scale(${scale})` }}>
       <div className="flower-head">
-        {Array.from({ length: petalCount }).map((_, i) => (
-          <span
-            key={i}
-            className="petal"
-            style={{
-              "--i": i,
-              "--n": petalCount,
-              "--wobble": `${(pseudoRandom(i + f.id.length * 3) - 0.5) * 7}deg`,
-            }}
-          />
-        ))}
+        {Array.from({ length: petalCount }).map((_, i) => <span key={i} className="petal" style={{ "--i": i, "--n": petalCount, "--wobble": `${(pseudoRandom(i + f.id.length * 3) - 0.5) * 7}deg` }} />)}
         <span className="flower-core" />
-        {["rose", "peony", "hydrangea"].includes(f.id) && (
-          <span className="flower-inner">
-            {Array.from({ length: 7 }).map((_, i) => <i key={i} />)}
-          </span>
-        )}
+        {["rose", "peony", "hydrangea"].includes(f.id) && <span className="flower-inner">{Array.from({ length: 9 }).map((_, i) => <i key={i} />)}</span>}
       </div>
-      <div className="stem" />
-      <span className="leaf leaf-a" />
-      <span className="leaf leaf-b" />
+      <div className="stem" /><span className="leaf leaf-a" /><span className="leaf leaf-b" />
     </div>
   );
 }
 
-function PixelFlower({ type, scale = 1 }) {
-  const palette = {
-    "pixel-daisy": ["#FFF5D4", "#D7A83B", "#6C8B56"],
-    "pixel-tulip": ["#EE8EA5", "#B74D68", "#5E7D55"],
-    "pixel-lavender": ["#B69CDB", "#75569D", "#66855C"],
-    "pixel-rose": ["#D96F7E", "#923C50", "#5F7F59"],
-    "pixel-sunflower": ["#F3CA4D", "#9A642B", "#5E7C50"],
-    "pixel-bouquet": ["#E8A9BB", "#7D639B", "#5D805D"],
-  }[type] || ["#F2D6D8", "#A97080", "#658060"];
-
-  const cells = Array.from({ length: 9 });
-  return (
-    <div className="pixel-flower" style={{ transform: `scale(${scale})` }}>
-      <div className="pixel-canvas">
-        {cells.map((_, i) => (
-          <span
-            key={i}
-            className="pixel-block"
-            style={{
-              left: `${28 + (i % 3) * 14 + (pseudoRandom(i + 8) - 0.5) * 4}%`,
-              top: `${12 + Math.floor(i / 3) * 14 + (pseudoRandom(i + 18) - 0.5) * 4}%`,
-              background: i % 3 === 0 ? palette[1] : palette[0],
-            }}
-          />
-        ))}
-        <span className="pixel-center" style={{ background: palette[1] }} />
-        <span className="pixel-stem" style={{ background: palette[2] }} />
-        <span className="pixel-leaf left" style={{ background: palette[2] }} />
-        <span className="pixel-leaf right" style={{ background: palette[2] }} />
-      </div>
+function PixelFlower({ type, scale = 1, palette = "garden" }) {
+  const colors = FLOWER_PALETTES[palette]?.colors?.[type] || ["#F2D6D8", "#A97080"];
+  const leaf = palette === "vintage" ? "#64745F" : palette === "sunset" ? "#667C55" : "#64815B";
+  const cells = Array.from({ length: 12 });
+  return <div className="pixel-flower" style={{ transform: `scale(${scale})` }}>
+    <div className="pixel-canvas">
+      {cells.map((_, i) => <span key={i} className="pixel-block" style={{ left: `${24 + (i % 4) * 13 + (pseudoRandom(i + 8) - .5) * 3}%`, top: `${10 + Math.floor(i / 4) * 13 + (pseudoRandom(i + 18) - .5) * 3}%`, background: i % 4 === 0 ? colors[1] : colors[0] }} />)}
+      <span className="pixel-center" style={{ background: colors[1] }} /><span className="pixel-stem" style={{ background: leaf }} /><span className="pixel-leaf left" style={{ background: leaf }} /><span className="pixel-leaf right" style={{ background: leaf }} />
     </div>
-  );
+  </div>;
 }
 
-function FlowerCard({ flower, active, onClick }) {
+function FlowerCard({ flower, active, onClick, palette }) {
   return (
     <button className={`flower-card ${active ? "is-selected" : ""}`} onClick={onClick}>
       <span className="flower-card-check">{active ? <Check size={12} /> : ""}</span>
-      <span className="flower-card-art">
-        <FlowerIllustration flower={flower.id} scale={flower.kind === "pixel" ? 0.9 : 0.82} />
-      </span>
+      <span className="flower-card-art"><FlowerIllustration flower={flower.id} palette={palette} scale={flower.kind === "pixel" ? 0.9 : 0.82} /></span>
       <span className="flower-card-name">{flower.label}</span>
     </button>
   );
@@ -363,7 +310,7 @@ function getStemPosition(i, n, style) {
   };
 }
 
-function BouquetPreview({ selected, ribbon, wrap, size, arrangement }) {
+function BouquetPreview({ selected, ribbon, wrap, size, arrangement, palette }) {
   const wrapObj = WRAPS.find((w) => w.id === wrap) || WRAPS[0];
   const ribbonObj = RIBBONS.find((r) => r.id === ribbon) || RIBBONS[0];
 
@@ -432,7 +379,7 @@ function BouquetPreview({ selected, ribbon, wrap, size, arrangement }) {
                 zIndex: 30 + i,
               }}
             >
-              <FlowerIllustration flower={stem.type} scale={stem.type.startsWith("pixel") ? 0.75 : 0.9} />
+              <FlowerIllustration flower={stem.type} palette={palette} scale={stem.type.startsWith("pixel") ? 0.75 : 0.9} />
             </div>
           );
         })}
@@ -500,6 +447,7 @@ export default function App() {
   const [shareUrl, setShareUrl] = useState("");
   const [copied, setCopied] = useState(false);
   const [heartStyle, setHeartStyle] = useState("classic");
+  const [flowerPalette, setFlowerPalette] = useState("garden");
 
   const toggleFlower = (id) => {
     setAssembled(false);
@@ -607,20 +555,33 @@ export default function App() {
           overflow: hidden;
           border-bottom: 1px solid var(--line);
           background:
-            radial-gradient(circle at 50% 54%, rgba(255,255,255,.8), transparent 15rem),
-            linear-gradient(180deg, #F5D8D6 0%, #F7E5DA 47%, #F3EBDD 100%);
+            radial-gradient(circle at 50% 58%, rgba(255,226,168,.98) 0 4.5rem, rgba(255,186,128,.42) 4.6rem 10rem, transparent 10.1rem),
+            radial-gradient(ellipse at 50% 100%, #66714f 0 18%, #4f5d47 19% 30%, transparent 31%),
+            linear-gradient(180deg, #e99a9b 0%, #f5b08d 34%, #ffd09a 57%, #d88d83 75%, #59664d 100%);
         }
 
-        .hero:before,
-        .hero:after {
-          content: "";
+        .hero:before {
+          content: "♡  ♥  ♡  ♥  ♡";
           position: absolute;
-          border: 1px solid rgba(142,83,102,.16);
-          border-radius: 50%;
+          left: 0; right: 0; bottom: 27%;
+          color: rgba(255,244,238,.72);
+          font-size: clamp(24px, 4vw, 48px);
+          letter-spacing: clamp(12px, 3vw, 38px);
+          text-shadow: 0 3px 10px rgba(108,61,66,.18);
           pointer-events: none;
+          z-index: 1;
         }
-        .hero:before { width: 520px; height: 520px; left: -260px; top: 120px; }
-        .hero:after { width: 430px; height: 430px; right: -210px; top: 50px; }
+        .hero:after {
+          content: "✿   ♡   ❀   ♥   ✿   ♡   ❀";
+          position: absolute;
+          left: 0; right: 0; bottom: 4%;
+          color: rgba(244,231,195,.88);
+          font-size: clamp(18px, 2.5vw, 30px);
+          letter-spacing: clamp(8px, 2vw, 24px);
+          text-shadow: 0 2px 5px rgba(43,54,38,.35);
+          pointer-events: none;
+          z-index: 1;
+        }
 
         .hero-nav {
           position: absolute;
@@ -825,6 +786,25 @@ export default function App() {
           text-overflow: ellipsis;
         }
 
+
+        .palette-picker { margin: -4px 0 18px; padding: 14px; border: 1px solid rgba(120,95,100,.13); border-radius: 18px; background: rgba(255,252,247,.72); }
+        .palette-heading { display:flex; justify-content:space-between; gap:12px; align-items:baseline; margin-bottom:10px; }
+        .palette-heading strong { font-family: Georgia,serif; font-size:14px; text-transform:lowercase; }
+        .palette-heading span { font-size:10px; color:#8d7d80; }
+        .palette-options { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+        .palette-option { border:1px solid rgba(110,85,90,.13); background:#fffdfa; border-radius:13px; padding:9px; display:flex; align-items:center; gap:8px; text-align:left; cursor:pointer; transition:.2s ease; }
+        .palette-option:hover { transform:translateY(-1px); border-color:rgba(130,90,100,.3); }
+        .palette-option.is-selected { border-color:#9c6875; box-shadow:0 0 0 2px rgba(156,104,117,.11); background:#fff8f4; }
+        .palette-dots { display:grid; grid-template-columns:repeat(2,12px); gap:3px; flex:none; }
+        .palette-dots i { width:12px; height:12px; border-radius:50%; display:block; box-shadow:inset 0 0 0 1px rgba(60,40,40,.08); }
+        .palette-option b { display:block; font-size:10px; line-height:1.2; }
+        .palette-option small { display:block; font-size:8px; color:#9b898c; margin-top:2px; }
+        .flower-art { isolation:isolate; }
+        .flower-head { filter: saturate(1.08); }
+        .flower-art .petal { border:1px solid rgba(105,65,70,.07); box-shadow: inset -2px -4px 5px rgba(70,45,50,.11), inset 2px 2px 4px rgba(255,255,255,.28); }
+        .flower-art .flower-core { box-shadow: inset 0 1px 2px rgba(255,255,255,.35), 0 2px 4px rgba(65,45,45,.18); }
+        .flower-inner i { box-shadow: inset -1px -2px 2px rgba(75,45,50,.08); }
+        @media (max-width: 700px) { .palette-options { grid-template-columns:1fr; } .palette-heading { flex-direction:column; gap:3px; } }
         .flower-art {
           position: relative;
           width: 88px;
@@ -1421,6 +1401,18 @@ export default function App() {
               choose your flowers
             </SectionTitle>
 
+            <div className="palette-picker">
+              <div className="palette-heading"><strong>flower colour mood</strong><span>choose the palette for your garden</span></div>
+              <div className="palette-options">
+                {Object.entries(FLOWER_PALETTES).map(([id, option]) => (
+                  <button key={id} className={`palette-option ${flowerPalette === id ? "is-selected" : ""}`} onClick={() => setFlowerPalette(id)}>
+                    <span className="palette-dots"><i style={{ background: option.colors.rose[0] }} /><i style={{ background: option.colors.sunflower[0] }} /><i style={{ background: option.colors.lavender[0] }} /><i style={{ background: option.colors.tulip[0] }} /></span>
+                    <span><b>{option.label}</b><small>{option.description}</small></span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="flower-grid">
               {FLOWERS.filter((f) => f.kind === "real").map((flower) => (
                 <FlowerCard
@@ -1577,6 +1569,7 @@ export default function App() {
             wrap={wrap}
             size={size}
             arrangement={arrangement}
+            palette={flowerPalette}
           />
 
           <div className="preview-controls">
