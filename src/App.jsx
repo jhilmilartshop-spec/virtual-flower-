@@ -2,17 +2,103 @@ import React, { useState, useMemo, useRef } from "react";
 import { Flower2, Share2, Mail, Link2, QrCode, Check, Sparkles } from "lucide-react";
 
 const FLOWER_TYPES = [
-  { id: "daisy", label: "daisies", petals: 12, petalShape: "round", colors: ["#FBF4E8"], centerColor: "#E9B44C" },
-  { id: "lily", label: "lilies", petals: 6, petalShape: "long", colors: ["#E38665", "#FBF4E8", "#9A7FB8"], centerColor: "#8B5E2E" },
-  { id: "mum", label: "chrysanthemums", petals: 18, petalShape: "thin", colors: ["#E9B44C", "#E38665", "#FBF4E8"], centerColor: "#8B5E2E" },
-  { id: "orchid", label: "orchids", petals: 5, petalShape: "orchid", colors: ["#9A7FB8", "#E38665"], centerColor: "#FBF4E8" },
-  { id: "wild", label: "wildflowers", petals: 8, petalShape: "small", colors: ["#8FB3D9", "#E9B44C", "#9A7FB8"], centerColor: "#3E2A44" },
-  { id: "tulip", label: "tulips", petals: 6, petalShape: "cup", distScale: 0.6, colors: ["#E38665", "#9A7FB8", "#EFC9C0"], centerColor: "#E9B44C" },
-  { id: "rose", label: "roses", petals: 8, layers: 2, petalShape: "ruffle", distScale: 0.75, colors: ["#E38665", "#FBF4E8", "#E9B44C"], centerColor: "#C77B62" },
-  { id: "peony", label: "peonies", petals: 10, layers: 3, petalShape: "ruffle", distScale: 0.7, colors: ["#EFC9C0", "#FBF4E8", "#9A7FB8"], centerColor: "#E9B44C" },
-  { id: "ranunculus", label: "ranunculus", petals: 10, layers: 2, petalShape: "round", distScale: 0.55, colors: ["#E38665", "#E9B44C", "#FBF4E8"], centerColor: "#C77B62" },
-  { id: "sunflower", label: "sunflowers", petals: 16, petalShape: "ray", distScale: 1.3, colors: ["#E9B44C"], centerColor: "#4A2E1A" },
-  { id: "babysbreath", label: "baby's breath", spray: true, colors: ["#FBF4E8"] },
+  { 
+    id: "daisy", 
+    label: "daisies", 
+    petals: 14, 
+    petalShape: "daisy-petal", 
+    colors: ["#FFF9E6", "#FFFAED"], 
+    centerColor: "#F4D03F",
+    layers: 1
+  },
+  { 
+    id: "lily", 
+    label: "lilies", 
+    petals: 6, 
+    petalShape: "lily-petal", 
+    colors: ["#FF6B6B", "#FF8787", "#FFB3B3"], 
+    centerColor: "#CC5555",
+    layers: 2
+  },
+  { 
+    id: "mum", 
+    label: "chrysanthemums", 
+    petals: 20, 
+    petalShape: "mum-petal", 
+    colors: ["#FFD93D", "#FFC926", "#FFB700"], 
+    centerColor: "#D4A300",
+    layers: 2
+  },
+  { 
+    id: "orchid", 
+    label: "orchids", 
+    petals: 5, 
+    petalShape: "orchid-petal", 
+    colors: ["#D4A5FF", "#E6C9FF", "#F0D9FF"], 
+    centerColor: "#B080FF",
+    layers: 1
+  },
+  { 
+    id: "wild", 
+    label: "wildflowers", 
+    petals: 7, 
+    petalShape: "wild-petal", 
+    colors: ["#87CEEB", "#B0E0E6", "#ADD8E6"], 
+    centerColor: "#4A90E2",
+    layers: 1
+  },
+  { 
+    id: "tulip", 
+    label: "tulips", 
+    petals: 6, 
+    petalShape: "tulip-petal", 
+    colors: ["#FF69B4", "#FFB6D9", "#FFC0E0"], 
+    centerColor: "#E63384",
+    layers: 1
+  },
+  { 
+    id: "rose", 
+    label: "roses", 
+    petals: 12, 
+    petalShape: "rose-petal", 
+    colors: ["#E74C3C", "#C0392B", "#A93226"], 
+    centerColor: "#78281F",
+    layers: 3
+  },
+  { 
+    id: "peony", 
+    label: "peonies", 
+    petals: 16, 
+    petalShape: "peony-petal", 
+    colors: ["#FFB6D9", "#FFC0E0", "#FFD4E5"], 
+    centerColor: "#FF69B4",
+    layers: 3
+  },
+  { 
+    id: "ranunculus", 
+    label: "ranunculus", 
+    petals: 14, 
+    petalShape: "ranunculus-petal", 
+    colors: ["#FF9FF3", "#FFAFF5", "#FFBFF7"], 
+    centerColor: "#FF69B4",
+    layers: 2
+  },
+  { 
+    id: "sunflower", 
+    label: "sunflowers", 
+    petals: 18, 
+    petalShape: "sunflower-petal", 
+    colors: ["#FFD700", "#FFC700", "#FFB700"], 
+    centerColor: "#8B7500",
+    layers: 1
+  },
+  { 
+    id: "babysbreath", 
+    label: "baby's breath", 
+    spray: true, 
+    colors: ["#FFFAED"],
+    centerColor: "#F0F0F0"
+  },
 ];
 
 const ARRANGEMENTS = [
@@ -36,19 +122,42 @@ const WRAPS = [
   { id: "plum", label: "plum", hex: "#6E5470" },
 ];
 
-const PETAL_SHAPES = {
-  round: { w: 9, h: 9, r: "9999px" },
-  long: { w: 6, h: 15, r: "50% 50% 4px 4px" },
-  thin: { w: 4, h: 13, r: "9999px" },
-  orchid: { w: 8, h: 12, r: "60% 40% 60% 40%" },
-  small: { w: 6, h: 6, r: "9999px" },
-  cup: { w: 10, h: 13, r: "50% 50% 70% 70%" },
-  ruffle: { w: 7, h: 9, r: "40% 70% 40% 70%" },
-  ray: { w: 4, h: 22, r: "50% 50% 2px 2px" },
-};
+const HEART_COLORS = ["#FF6B6B", "#FFB6D9", "#FF69B4", "#E74C3C", "#C71585", "#FF1493", "#DC143C"];
 
-function Petal({ shape, color, rotate, dist, scale = 1 }) {
-  const s = PETAL_SHAPES[shape] || PETAL_SHAPES.round;
+function Heart({ x, y, color, size = 6, delay = 0 }) {
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: `${x}%`,
+        top: `${y}%`,
+        animation: `float ${3 + (delay % 2)}s ease-in-out infinite`,
+        animationDelay: `${delay}s`,
+      }}
+    >
+      <svg width={size} height={size} viewBox="0 0 24 24" fill={color} opacity="0.7">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+      </svg>
+    </div>
+  );
+}
+
+function Petal({ shape, color, rotate, dist, scale = 1, opacity = 0.9 }) {
+  const shapes = {
+    "daisy-petal": { w: 10, h: 14, r: "50% 50% 50% 30%", blur: 0.5 },
+    "lily-petal": { w: 9, h: 16, r: "60% 60% 40% 40%", blur: 1 },
+    "mum-petal": { w: 6, h: 12, r: "50% 50% 40% 40%", blur: 0.3 },
+    "orchid-petal": { w: 10, h: 14, r: "60% 40% 50% 50%", blur: 1 },
+    "wild-petal": { w: 7, h: 9, r: "50% 50% 50% 50%", blur: 0.4 },
+    "tulip-petal": { w: 11, h: 15, r: "50% 50% 70% 70%", blur: 0.8 },
+    "rose-petal": { w: 8, h: 10, r: "40% 70% 40% 70%", blur: 1.2 },
+    "peony-petal": { w: 9, h: 11, r: "50% 50% 60% 50%", blur: 1 },
+    "ranunculus-petal": { w: 8, h: 9, r: "50% 50% 50% 50%", blur: 0.8 },
+    "sunflower-petal": { w: 6, h: 20, r: "50% 50% 3% 3%", blur: 0.5 },
+  };
+
+  const s = shapes[shape] || shapes["daisy-petal"];
+
   return (
     <div
       style={{
@@ -60,6 +169,9 @@ function Petal({ shape, color, rotate, dist, scale = 1 }) {
         left: "50%",
         top: "50%",
         transform: `translate(-50%,-50%) rotate(${rotate}deg) translateY(-${dist}px)`,
+        filter: `blur(${s.blur}px)`,
+        opacity: opacity,
+        boxShadow: `inset -1px -1px 2px rgba(0,0,0,0.15)`,
       }}
     />
   );
@@ -68,18 +180,18 @@ function Petal({ shape, color, rotate, dist, scale = 1 }) {
 function Flower({ type, size = 1, seedColor, style, animDelay = 0, sway = false }) {
   const def = FLOWER_TYPES.find((f) => f.id === type) || FLOWER_TYPES[0];
   const color = seedColor || def.colors[0];
-  const baseDist = 8 * size;
+  const baseDist = 9 * size;
   const layers = def.layers || 1;
 
   return (
     <div
       className={sway ? "gb-sway" : ""}
-      style={{ position: "relative", width: 40 * size, height: 40 * size, animationDelay: `${animDelay}s`, ...style }}
+      style={{ position: "relative", width: 50 * size, height: 50 * size, animationDelay: `${animDelay}s`, ...style }}
     >
       {def.spray
-        ? Array.from({ length: 7 }).map((_, k) => {
-            const ang = (k * 137.5) % 360;
-            const r = 7 * size * ((k % 3) + 1) / 3;
+        ? Array.from({ length: 9 }).map((_, k) => {
+            const ang = (k * 40) % 360;
+            const r = 8 * size * ((k % 3) + 1) / 3;
             const x = Math.cos((ang * Math.PI) / 180) * r;
             const y = Math.sin((ang * Math.PI) / 180) * r;
             return (
@@ -89,26 +201,32 @@ function Flower({ type, size = 1, seedColor, style, animDelay = 0, sway = false 
                   position: "absolute",
                   left: "50%",
                   top: "50%",
-                  width: 5 * size,
-                  height: 5 * size,
+                  width: 4 * size,
+                  height: 4 * size,
                   background: color,
                   borderRadius: "9999px",
                   transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`,
+                  opacity: 0.8,
                 }}
               />
             );
           })
         : Array.from({ length: layers }).map((_, L) =>
-            Array.from({ length: def.petals }).map((_, i) => (
-              <Petal
-                key={`${L}-${i}`}
-                shape={def.petalShape}
-                color={color}
-                rotate={(360 / def.petals) * i + L * (180 / def.petals)}
-                dist={baseDist * (def.distScale || 1) * (1 - L * 0.25)}
-                scale={1 - L * 0.12}
-              />
-            ))
+            Array.from({ length: def.petals }).map((_, i) => {
+              const layerOpacity = 0.95 - L * 0.15;
+              const layerColorShift = L > 0 ? def.colors[Math.min(L, def.colors.length - 1)] : color;
+              return (
+                <Petal
+                  key={`${L}-${i}`}
+                  shape={def.petalShape}
+                  color={layerColorShift}
+                  rotate={(360 / def.petals) * i + L * (180 / def.petals)}
+                  dist={baseDist * (1 - L * 0.2)}
+                  scale={1 - L * 0.15}
+                  opacity={layerOpacity}
+                />
+              );
+            })
           )}
       {!def.spray && (
         <div
@@ -116,11 +234,12 @@ function Flower({ type, size = 1, seedColor, style, animDelay = 0, sway = false 
             position: "absolute",
             left: "50%",
             top: "50%",
-            width: 8 * size,
-            height: 8 * size,
+            width: 10 * size,
+            height: 10 * size,
             background: def.centerColor || "#E9B44C",
             borderRadius: "9999px",
             transform: "translate(-50%,-50%)",
+            boxShadow: `inset -2px -2px 3px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.1)`,
           }}
         />
       )}
@@ -139,11 +258,11 @@ function OrchidArch() {
       {orchidSpots.map((s, i) => {
         const cx = 200 - 180 * Math.cos(s.angle);
         const cy = 220 - 200 * Math.sin(s.angle);
-        const color = i % 2 === 0 ? "#9A7FB8" : "#E9B44C";
+        const color = i % 2 === 0 ? "#D4A5FF" : "#FFD700";
         return (
           <g key={i} transform={`translate(${cx},${cy})`}>
-            <circle r="7" fill={color} opacity="0.9" />
-            <circle r="3" fill="#FBF4E8" opacity="0.9" />
+            <circle r="7" fill={color} opacity="0.95" />
+            <circle r="3" fill="#FBF4E8" opacity="0.95" />
           </g>
         );
       })}
@@ -153,12 +272,27 @@ function OrchidArch() {
 
 function GardenHero() {
   const daisyRow = Array.from({ length: 22 });
+  const hearts = Array.from({ length: 15 });
+
   return (
     <div className="relative w-full h-[62vh] min-h-[420px] overflow-hidden rounded-b-[2.5rem]">
       <div
         className="absolute inset-0"
         style={{ background: "linear-gradient(180deg, #3E2A44 0%, #6B4A6E 22%, #C77B62 48%, #E9B44C 68%, #F3D9A4 100%)" }}
       />
+
+      {/* Scattered hearts */}
+      {hearts.map((_, i) => (
+        <Heart
+          key={i}
+          x={Math.random() * 100}
+          y={Math.random() * 100}
+          color={HEART_COLORS[i % HEART_COLORS.length]}
+          size={4 + Math.random() * 4}
+          delay={Math.random() * 3}
+        />
+      ))}
+
       <div
         className="gb-sun absolute rounded-full"
         style={{ width: 120, height: 120, left: "50%", top: "38%", background: "radial-gradient(circle, #FBEFD0 0%, #E9B44C 60%, rgba(233,180,76,0) 75%)", transform: "translate(-50%,-50%)" }}
@@ -170,14 +304,14 @@ function GardenHero() {
       </div>
       <div className="absolute bottom-2 left-0 right-0 flex justify-around px-4">
         {daisyRow.map((_, i) => (
-          <Flower key={i} type="daisy" size={0.55 + (i % 3) * 0.12} sway animDelay={(i % 7) * 0.3} />
+          <Flower key={i} type="daisy" size={0.6 + (i % 3) * 0.15} sway animDelay={(i % 7) * 0.3} />
         ))}
       </div>
-      <Flower type="mum" size={0.7} sway animDelay={0.2} style={{ position: "absolute", left: "12%", bottom: "30%" }} />
-      <Flower type="wild" size={0.6} seedColor="#8FB3D9" sway animDelay={0.6} style={{ position: "absolute", left: "78%", bottom: "34%" }} />
-      <Flower type="lily" size={0.75} seedColor="#9A7FB8" sway animDelay={0.4} style={{ position: "absolute", left: "22%", bottom: "38%" }} />
-      <Flower type="orchid" size={0.65} sway animDelay={0.9} style={{ position: "absolute", left: "68%", bottom: "26%" }} />
-      <Flower type="sunflower" size={0.6} sway animDelay={0.5} style={{ position: "absolute", left: "88%", bottom: "22%" }} />
+      <Flower type="mum" size={0.8} sway animDelay={0.2} style={{ position: "absolute", left: "12%", bottom: "30%" }} />
+      <Flower type="wild" size={0.7} seedColor="#87CEEB" sway animDelay={0.6} style={{ position: "absolute", left: "78%", bottom: "34%" }} />
+      <Flower type="lily" size={0.85} seedColor="#FF8787" sway animDelay={0.4} style={{ position: "absolute", left: "22%", bottom: "38%" }} />
+      <Flower type="orchid" size={0.75} sway animDelay={0.9} style={{ position: "absolute", left: "68%", bottom: "26%" }} />
+      <Flower type="sunflower" size={0.7} sway animDelay={0.5} style={{ position: "absolute", left: "88%", bottom: "22%" }} />
 
       <div className="absolute top-6 left-1/2 -translate-x-1/2 text-center">
         <span className="text-[#FBF4E8] text-lg tracking-[0.15em] uppercase" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
@@ -345,6 +479,10 @@ export default function App() {
   return (
     <div style={{ background: "#FBF4E8", minHeight: "100vh" }}>
       <style>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-8px); }
+        }
         .gb-sway { animation: gbSway 4.5s ease-in-out infinite; transform-origin: bottom center; }
         @keyframes gbSway { 0%,100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
         .gb-sun { animation: gbGlow 6s ease-in-out infinite; }
@@ -352,7 +490,7 @@ export default function App() {
         .gb-pop { opacity: 0; animation: gbPop 0.5s ease-out forwards; }
         @keyframes gbPop { from { opacity: 0; transform: translateX(-50%) translateY(14px) scale(0.7); } to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); } }
         @media (prefers-reduced-motion: reduce) {
-          .gb-sway, .gb-sun, .gb-pop { animation: none !important; }
+          .gb-sway, .gb-sun, .gb-pop, .float { animation: none !important; }
         }
       `}</style>
 
@@ -504,4 +642,4 @@ export default function App() {
       </footer>
     </div>
   );
-}
+    }
